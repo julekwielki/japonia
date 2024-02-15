@@ -80,7 +80,7 @@ plt.title("Parity fit - after 20 weeks - fit for c")
 plt.show()
 # """  # full fit with c
 
-"""
+# """
 
 def func(x, a, n):
     return 1 - np.exp(-a * np.power(x, n))
