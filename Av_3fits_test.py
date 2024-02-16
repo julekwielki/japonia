@@ -18,19 +18,6 @@ a, b, c = A.toasty()
 print(a, b, c)"""
 
 
-x1 = [x * 7/365 for x in Avrami_data.T_20w_time70]
-x2 = [x * 7/365 for x in Avrami_data.T_20w_time71]
-
-y1 = [1-x for x in Avrami_data.T_20w_survival70]
-y2 = [1-x for x in Avrami_data.T_20w_survival71]
-
-sd1 = Avrami_data.T_20w_std70
-sd2 = Avrami_data.T_20w_std71
-
-A = Fitted(x1, x2, y1, y2, sd1, sd2, [0, 0, 0], [1, 6, 6])
-A.fit_one()
-
-
 time_all0 = Avrami_data.T_time_all0
 survival_all0 = Avrami_data.T_survival_all0
 std_all0 = Avrami_data.T_std_all0

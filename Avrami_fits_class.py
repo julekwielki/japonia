@@ -38,23 +38,6 @@ class Fitted(object):
         result2 = self.fun2(extract2, a, n1, n2)
         return np.append(result1, result2)
 
-    def fit_one(self):
-        self.popt1, self.pcov1 = curve_fit(self.function, self.x1, self.y1, sigma=self.sd1, bounds=([0, 0], [1, 5]))
-        self.perr1 = np.sqrt(np.diag(self.pcov1))  # standard deviation error
-
-        print(self.popt1)
-
-        residuals = self.y1 - self.function(self.x1, *self.popt1)
-        ss_res = np.sum(residuals ** 2)
-        ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
-        self.r_squared1 = 1 - (ss_res / ss_tot)
-
-        plt.scatter(self.x1, self.y1, label="data1", color='orange')
-        plt.plot(self.x1, [self.function(x, self.popt1[0], self.popt1[1]) for x in self.x1], '--',
-                 label='fit: a=%.5f, n=%.3f' % (self.popt1[0], self.popt1[1]), color='orange')
-        plt.errorbar(self.x1, self.y1, yerr=self.sd1, fmt='o', ecolor='orange', color='orange')
-        plt.show()
-
     def final_fit_sd(self):
         self.popt1, self.pcov1 = curve_fit(self.function, self.x1, self.y1, sigma=self.sd1,
                                            bounds=([self.bound_low[0], self.bound_low[1]],
