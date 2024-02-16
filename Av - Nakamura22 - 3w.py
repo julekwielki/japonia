@@ -70,7 +70,7 @@ plt.show()
 
 # """  # avrami fit, paramteter c
 
-"""
+# """
 
 
 def function(x, a, n):
