@@ -74,7 +74,7 @@ plt.legend()
 plt.show()
 
 # """
-"""
+#"""
 for i in range(len(t)):
     A = Fitted([x*7/365 for x in t[i]], [1-x for x in surv[i]], stdev[i])
     A.fit_both()

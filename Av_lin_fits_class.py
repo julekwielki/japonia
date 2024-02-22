@@ -9,6 +9,9 @@ class Fitted(object):
         self.y1 = y1
         self.y2 = [np.log(-np.log(1 - y)) for y in self.y1]
 
+        print("fitted")
+        print(self.y2)
+
         self.sd1 = sd1
         self.sd2 = [np.abs(sd1[i]/(np.log(1-y1[i])*(1 - y1[i]))) for i in range(len(sd1))]
 
