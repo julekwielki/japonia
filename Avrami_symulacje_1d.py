@@ -3,8 +3,10 @@ import random
 import matplotlib.pyplot as plt
 from Av_lin_fits_class import Fitted
 
-length = 1000
+length = 100000
 p = 0.005
+p0 = 0.0005
+aa = 0.0005
 ziarna = []
 ziarna_t = []
 data = np.zeros(length)
@@ -21,14 +23,15 @@ def add_ziarna(t):
                 ziarna_t.append(t)
 
 
-add_ziarna(0)
-print(ziarna)
+
 
 """
+add_ziarna(0)
+print(ziarna)
 if len(ziarna) > 0:
     for t in range(1, 100):
         print(t)
-        # add_ziarna(t)
+        add_ziarna(t)
         for i in range(len(data)):
             if data[i] == 0:
 
@@ -66,7 +69,9 @@ if len(ziarna) > 0:
     A.plot_data()
 # """  # nowe ziarna lub nie ze wzrostem ziaren
 
-# """
+"""
+add_ziarna(0)
+print(ziarna)
 if len(ziarna) > 0:
     for t in range(1, 100):
         print(t)
@@ -78,6 +83,8 @@ if len(ziarna) > 0:
             if i != 0:
                 a += 1
         av.append(a)
+        if a == length ** 3:
+            break
 
     av.pop(0)
     time.pop(0)
@@ -100,3 +107,47 @@ if len(ziarna) > 0:
     A.fit_both()
     A.plot_data()
 # """  # nowe ziarna bez wzrostu ziaren
+
+# """
+p = aa * 0 + p0
+
+add_ziarna(0)
+print(ziarna)
+for t in range(1, 100):
+
+    p = aa * t**3 + p0
+
+    add_ziarna(t)
+
+    time.append(t)
+    a = 0
+    for i in data:
+        if i != 0:
+            a += 1
+    av.append(a)
+    print(t, p, a)
+    if a == length:
+        break
+
+av.pop(0)
+time.pop(0)
+
+avr_log, time_log, time2, av2 = [], [], [], []
+
+for i in range(len(av)):
+    if 0 < av[i] < len(data):
+        avr_log.append(np.log(-np.log(1 - av[i] / len(data))))
+        time2.append(time[i] / 10)
+        time_log.append(np.log(time[i]))
+        av2.append(av[i] / len(data))
+
+# fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+# ax[0].scatter(time, av)
+# ax[1].scatter(time_log, avr_log)
+# plt.show()
+
+A = Fitted(time2, av2)
+A.fit_both()
+A.plot_data()
+
+# """
