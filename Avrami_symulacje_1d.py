@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 from Av_lin_fits_class import Fitted
 
-length = 1000
+length = 5000
 p = 0.005
 ziarna = []
 ziarna_t = []
@@ -66,7 +66,7 @@ if len(ziarna) > 0:
     A.plot_data()
 # """  # nowe ziarna lub nie ze wzrostem ziaren
 
-# """
+"""
 if len(ziarna) > 0:
     for t in range(1, 100):
         print(t)
@@ -97,6 +97,42 @@ if len(ziarna) > 0:
     # plt.show()
 
     A = Fitted(time2, av2)
+    A.fit_both()
+    A.plot_data()
+# """  # nowe ziarna bez wzrostu ziaren
+
+# """
+if len(ziarna) > 0:
+    for t in range(1, 100):
+        print(t)
+        p = 0.005 * t**2 + 0.005
+        add_ziarna(t)
+
+        time.append(t)
+        a = 0
+        for i in data:
+            if i != 0:
+                a += 1
+        av.append(a)
+
+    av.pop(0)
+    time.pop(0)
+
+    avr_log, time_log, time2, av2 = [], [], [], []
+
+    for i in range(len(av)):
+        if 0 < av[i] < len(data):
+            avr_log.append(np.log(-np.log(1 - av[i] / len(data))))
+            time2.append(time[i] / 10)
+            time_log.append(np.log(time[i]))
+            av2.append(av[i] / len(data))
+
+    # fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+    # ax[0].scatter(time, av)
+    # ax[1].scatter(time_log, avr_log)
+    # plt.show()
+
+    A = Fitted(time2, av2,bound_high=[5,10])
     A.fit_both()
     A.plot_data()
 # """  # nowe ziarna bez wzrostu ziaren

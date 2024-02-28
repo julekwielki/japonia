@@ -9,9 +9,6 @@ class Fitted(object):
         self.y1 = y1
         self.y2 = [np.log(-np.log(1 - y)) for y in self.y1]
 
-        print("fitted")
-        print(self.y2)
-
         self.sd1 = sd1
         self.sd2 = [np.abs(sd1[i]/(np.log(1-y1[i])*(1 - y1[i]))) for i in range(len(sd1))]
 
@@ -39,7 +36,6 @@ class Fitted(object):
         residuals = self.y2 - self.function_ln(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
-        print(1 - (ss_res / ss_tot))
 
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
@@ -52,7 +48,6 @@ class Fitted(object):
         residuals = self.y1 - self.function(self.x1, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
-        print(1 - (ss_res / ss_tot))
 
     def fit_both_sd(self):
         self.popt1, self.pcov1 = curve_fit(self.function, self.x1, self.y1, sigma=self.sd1, bounds=(self.bound_low, self.bound_high))
@@ -66,7 +61,6 @@ class Fitted(object):
         residuals = self.y2 - self.function_ln(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
-        print(1 - (ss_res / ss_tot))
 
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, sigma=self.sd2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
@@ -79,7 +73,6 @@ class Fitted(object):
         residuals = self.y1 - self.function(self.x1, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
-        print(1 - (ss_res / ss_tot))
 
     def plot_data(self):
         fig, ax = plt.subplots(1, 2, figsize=(12, 5))
@@ -108,9 +101,9 @@ class Fitted(object):
 
         plt.show()
 
-    def plot_data_sd(self):
+    def plot_data_sd(self, title=""):
         fig, ax = plt.subplots(1, 2, figsize=(12, 5))
-
+        fig.suptitle(title)
         ax[0].scatter(self.x1, self.y1, label="data1", color='orange')
         ax[0].plot(self.x1, [self.function(x, self.popt1[0], self.popt1[1]) for x in self.x1], '--',
                    label='fit norm: a=%.5f, n=%.3f' % (self.popt1[0], self.popt1[1]), color='orange')
@@ -129,10 +122,15 @@ class Fitted(object):
         ax[1].plot(self.x1, [self.function_ln(x, self.popt1[0], self.popt1[1]) for x in self.x1], '--',
                    label='fit norm: a=%.5f, n=%.3f' % (self.popt1[0], self.popt1[1]), color='orange')
 
-        ax[1].errorbar(self.x1, self.y2, yerr=self.sd2, fmt='o', ecolor='orange', color='orange')
+        ax[1].errorbar(self.x1, self.y2, yerr=self.sd2, fmt='o', ecolor='blue', color='blue')
         ax[1].set_xscale('log')
         ax[1].legend()
         ax[1].set_xlabel("time (years)")
         ax[1].set_ylabel("zlogarytmowane")
 
         plt.show()
+
+    def toasty(self):
+        dane1 = {'param': self.popt1, 'cov': self.pcov1, 'err': self.perr1, 'r2': self.r_squared1}
+        dane2 = {'param': self.popt_ln, 'cov': self.pcov_ln, 'err': self.perr_ln, 'r2': self.r_squared_ln}
+        return dane1, dane2
