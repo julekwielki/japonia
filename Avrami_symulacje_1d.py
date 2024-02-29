@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 from Av_lin_fits_class import Fitted
 
-length = 1000
+length = 10000
 p = 0.005
 p0 = 0.0005
 aa = 0.0005
@@ -21,6 +21,7 @@ def add_ziarna(t):
                 data[i] = 1
                 ziarna.append(i)
                 ziarna_t.append(t)
+
 
 add_ziarna(0)
 print(ziarna)
@@ -111,7 +112,7 @@ add_ziarna(0)
 print(ziarna)
 for t in range(1, 100):
 
-    p = aa * t**3 + p0
+    p = aa * t + p0
 
     add_ziarna(t)
 

@@ -23,11 +23,19 @@ def add_ziarna(t):
                     ziarna_t.append(t)
 
 
-add_ziarna(0)
-print(len(ziarna_t))
+def ziarno_xy(x, y, t):
+    data[x][y] = 1
+    ziarna[0].append(x)
+    ziarna[1].append(y)
+    ziarna_t.append(t)
+
+
+# add_ziarna(0)
+# print(len(ziarna_t))
 # time.append(0)
 # av.append(len(ziarna_t))
-"""
+ziarno_xy(0, 0, 0)
+# """
 if len(ziarna_t) > 0:
     for t in range(1, 50):
         print(t)
@@ -101,7 +109,7 @@ A.plot_data()
 # """  # nowe ziarna ze wzrostem ziaren
 
 
-# """
+"""
 for t in range(1, 50):
     print(t)
     add_ziarna(t)
