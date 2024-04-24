@@ -18,7 +18,7 @@ A.plot_data_sd()
 a, b, c = A.toasty()
 print(a, b, c)"""
 
-# """
+"""
 time_all0 = Avrami_data.T_time_all0
 survival_all0 = Avrami_data.T_survival_all0
 std_all0 = Avrami_data.T_std_all0
@@ -28,7 +28,7 @@ survival_all1 = Avrami_data.T_survival_all1
 std_all1 = Avrami_data.T_std_all1
 # """
 
-"""
+# """
 time_all0 = Avrami_data.T_20w_time_all0
 survival_all0 = Avrami_data.T_20w_survival_all0
 std_all0 = Avrami_data.T_20w_std_all0

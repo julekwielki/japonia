@@ -81,7 +81,8 @@ class Fitted(object):
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
 
-        """print(self.y1)
+        """
+        print(self.y1)
         print([self.function(x, *self.popt1) for x in self.x1])
         print(np.sum(self.y1) / np.sum([self.function(x, *self.popt1) for x in self.x1]) * np.array([self.function(x, *self.popt1) for x in self.x1]))
 
@@ -177,3 +178,37 @@ class Fitted(object):
         dane1 = {'param': self.popt1, 'cov': self.pcov1, 'err': self.perr1, 'r2': self.r_squared1}
         dane2 = {'param': self.popt_ln, 'cov': self.pcov_ln, 'err': self.perr_ln, 'r2': self.r_squared_ln}
         return dane1, dane2
+
+
+class Fitted_one_log(object):
+    def __init__(self, x, y, sd=[]):
+        self.x = x
+        self.y = [np.log(-np.log(1 - y)) for y in y]
+
+        self.sd = [np.abs(sd[i]/(np.log(1-y[i])*(1 - y[i]))) for i in range(len(sd))]
+
+        self.popt_ln, self.pcov_ln, self.perr_ln, self.r_squared_ln = [], [], [], 0
+
+    def function_ln(self, x, a, n):
+        return np.log(a) + n * np.log(x)
+
+    def fit_both_sd(self):
+        self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x, self.y, sigma=self.sd)
+        self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
+
+        residuals = self.y - self.function_ln(self.x, *self.popt_ln)
+        ss_res = np.sum(residuals ** 2)
+        ss_tot = np.sum((self.y - np.mean(self.y)) ** 2)
+        self.r_squared_ln = 1 - (ss_res / ss_tot)
+        return self.popt_ln, self.pcov_ln, self.perr_ln, self.r_squared_ln
+
+    def fit_both(self):
+
+        self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x, self.y)
+        self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
+
+        residuals = self.y - self.function_ln(self.x, *self.popt_ln)
+        ss_res = np.sum(residuals ** 2)
+        ss_tot = np.sum((self.y - np.mean(self.y)) ** 2)
+        self.r_squared_ln = 1 - (ss_res / ss_tot)
+        return self.popt_ln, self.pcov_ln, self.perr_ln, self.r_squared_ln

@@ -3,7 +3,8 @@ import math
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import numpy as np
-
+from Av_lin_fits_class import Fitted_one_log
+from Av_lin_fits_class import Fitted
 
 time00 = [33, 38, 47, 48, 55, 68, 70, 73, 91]
 survival00 = [0.962, 0.923, 0.885, 0.846, 0.806, 0.761, 0.714, 0.618, 0.515]
@@ -80,7 +81,7 @@ plt.title("Parity fit - after 20 weeks - fit for c")
 plt.show()
 # """  # full fit with c
 
-# """
+"""
 
 def func(x, a, n):
     return 1 - np.exp(-a * np.power(x, n))
@@ -292,3 +293,50 @@ plt.title("Parity fit - after 20 weeks - c = 1 (t0 p1)")
 plt.show()
 
 # """  # fit for c = 1, t0 p1 by hand
+
+
+# """
+def func(x, a, n):
+    return np.log(a) + n * np.log(x)
+
+t = [time00, time01, time30, time31, time70, time71]
+surv = [survival00, survival01, survival30, survival31, survival70, survival71]
+stdev = [std00, std01, std30, std31, std70, std71]
+name = ["t0 p0", "t0 p1", "t3 p0", "t3 p1", "t7 p0", "t7 p1"]
+col = ['blue', 'orange', 'green', 'red', 'plum', 'brown']
+
+
+text = ""
+for i in range(len(t)):
+    xx = t[i]
+    xx2 = [x*7/365 for x in xx]
+    sd = stdev[i]
+    data = [1-x for x in surv[i]]
+    yy = [np.log(-np.log(1 - y)) for y in data]
+    sd_log = [np.abs(sd[i] / (np.log(1 - data[i]) * (1 - data[i]))) for i in range(len(sd))]
+    A = Fitted_one_log(xx2, data, sd)
+    popt, pcov, perr, r_squared = A.fit_both_sd()
+
+    # plt.errorbar(xx2, yy, yerr=sd_log, fmt='o', ecolor=col[i], color=col[i])
+    # plt.scatter(xx2, yy, label=name[i], color=col[i])
+    # plt.plot(xx2, [func(x, popt[0], popt[1]) for x in xx2], '--', label='fit: n=%.1f' % (popt[1]), color=col[i])
+    # print(name[i])
+    # print(popt)
+    # print(perr)
+    # print("r^2", r_squared)
+
+    # text = text + name[i] + "\na(u(a))\tn(u(n))\tr^2\n"
+    # text = text + f'{popt[0]:.3f}' + " (" + f'{perr[0]:.3f}' + ")\t" + f'{popt[1]:.5f}' + " (" + f'{perr[1]:.5f}' + ")\t" + f'{r_squared:.3f}' + "\n"
+
+    # text = text + name[i] + "\na\tu(a)\tn\tu(n)\tr^2\n"
+    # text = text + f'{popt[0]:.3f}' + "\t" + f'{perr[0]:.3f}' + "\t" + f'{popt[1]:.5f}' + "\t" + f'{perr[1]:.5f}' + "\t" + f'{r_squared:.3f}' + "\n"
+    plt.errorbar(popt[0], popt[1], xerr=perr[0], yerr=perr[1], fmt='o', ecolor=col[i], color=col[i], label=name[i])
+
+print(text)
+
+plt.legend()
+"""plt.xscale("log")
+plt.ylabel("log(-log(1 - x))")"""
+plt.show()
+
+# """  # log fit
