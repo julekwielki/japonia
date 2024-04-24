@@ -1,4 +1,6 @@
 from scipy.optimize import curve_fit
+from sklearn.metrics import r2_score
+import scipy.stats as stats
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -36,6 +38,23 @@ class Fitted(object):
         residuals = self.y2 - self.function_ln(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
+        print(self.popt1)
+        print(self.y1)
+        print([self.function(x, *self.popt1) for x in self.x1])
+        print(np.sum(self.y1) / np.sum([self.function(x, *self.popt1) for x in self.x1]) * np.array(
+            [self.function(x, *self.popt1) for x in self.x1]))
+
+        self.popt1, self.pcov1 = curve_fit(self.function, self.x1, [self.function(x, *self.popt1) for x in self.x1], bounds=(self.bound_low, self.bound_high))
+        print(self.popt1)
+
+        chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum(
+            [self.function(x, *self.popt1) for x in self.x1]) * np.array(
+            [self.function(x, *self.popt1) for x in self.x1]))
+        r_squared1 = r2_score(self.y1, self.function(self.x1, *self.popt1))
+        print('chi_square_test_statistic is : ' + str(chi_square_test_statistic))
+        print('p_value : ' + str(p_value))
+        print(stats.chi2.ppf(1 - 0.05, df=len(self.y1) - 1))  # """
+        print('r^2 : ' + str(r_squared1))
 
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
@@ -62,6 +81,19 @@ class Fitted(object):
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
 
+        """print(self.y1)
+        print([self.function(x, *self.popt1) for x in self.x1])
+        print(np.sum(self.y1) / np.sum([self.function(x, *self.popt1) for x in self.x1]) * np.array([self.function(x, *self.popt1) for x in self.x1]))
+
+        chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum([self.function(x, *self.popt1) for x in self.x1]) * np.array([self.function(x, *self.popt1) for x in self.x1]))
+        r_squared1 = r2_score(self.y1, self.function(self.x1, *self.popt1))
+        print('chi_square_test_statistic is : ' + str(chi_square_test_statistic))
+        print('p_value : ' + str(p_value))
+        print(stats.chi2.ppf(1 - 0.05, df=len(self.y1) - 1)) 
+        print('r^2 : ' + str(r_squared1))"""
+
+
+
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, sigma=self.sd2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
 
@@ -73,6 +105,17 @@ class Fitted(object):
         residuals = self.y1 - self.function(self.x1, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
+
+        chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum(
+            [self.function(x, *self.popt_ln) for x in self.x1]) * np.array(
+            [self.function(x, *self.popt_ln) for x in self.x1]))
+        r_squared1 = r2_score(self.y1, self.function(self.x1, *self.popt_ln))
+        print('chi_square_test_statistic is : ' + str(chi_square_test_statistic))
+        print('p_value : ' + str(p_value))
+        print(stats.chi2.ppf(1 - 0.05, df=len(self.y1) - 1))
+        print('r^2 : ' + str(r_squared1))
+
+        print("\n\n")
 
     def plot_data(self):
         fig, ax = plt.subplots(1, 2, figsize=(12, 5))
