@@ -1,7 +1,10 @@
+from scipy.stats import ks_2samp
+
 import Avrami_data
 from Av_lin_fits_class import Fitted
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 """x1 = Avrami_data.N_non_mut_x_years
 x2 = Avrami_data.N_mut_x_years
@@ -38,7 +41,6 @@ survival_all1 = Avrami_data.T_20w_survival_all1
 std_all1 = Avrami_data.T_20w_std_all1
 # """
 
-
 data1 = []
 data2 = []
 names = ["t0 p0", "t0 p1", "t3 p1", "t3 p0", "t7 p1", "t7 p0"]
@@ -58,6 +60,8 @@ for i in range(len(time_all0)):
     sd2 = std_all1[i]
 
     # """
+    print(names[i])
+
     A = Fitted(x1, y1, sd1)
     A.fit_both_sd()
     # A.plot_data_sd(names[i])
@@ -124,6 +128,8 @@ for i in range(len(time_all0)):
     print("a\tu(a)\tn\tu(n)\tr2")
     print(dane1["param"][0], dane1["err"][0], dane1["param"][1], dane1["err"][1], dane1["r2"])
     print(dane2["param"][0], dane2["err"][0], dane2["param"][1], dane2["err"][1], dane2["r2"])  # """
+
+    print(names[i+3])
 
     B = Fitted(x2, y2, sd2)
     B.fit_both_sd()
@@ -204,7 +210,7 @@ ax[1].set_ylabel("linearised data")
 # ax[1].plot(x2, [A.function_ln(x, 0.8133673, 1.6234204) for x in x2], '--', color='black')
 # fig.suptitle("dopasowanie do danych zlogarytmowanych, dane Tabatake po 20 tygodniu, narysowane dla krzywej sigmoidalnej i dla danych zlogarytmowanych")
 
-plt.show()# """
+# plt.show()# """
 
 for i in data2:
     print('a = %.3f (%.3f), k = %.3f (%.3f)' % (i["param"][0], i["err"][0], i["param"][1], i["err"][1]))
@@ -249,4 +255,40 @@ ax[2].legend()
 ax[2].set_xlabel("parametr a")
 ax[2].set_ylabel("parametr n")
 plt.show()
+# """
+
+"""
+
+aa_norm = []
+nn_norm = []
+aa_log = []
+nn_log = []
+names = ["t0 p0", "t0 p1", "t3 p0", "t3 p1", "t7 p0", "t7 p1"]
+col = ['blue', 'red', 'orange', 'plum', 'green', 'brown']
+
+for i in range(len(data1)):
+    a_norm = data1[i]["param"][0]
+    a_log = data2[i]["param"][0]
+
+    n_norm = data1[i]["param"][1]
+    n_log = data2[i]["param"][1]
+    aa_norm.append(a_norm)
+    nn_norm.append(n_norm)
+    aa_log.append(a_log)
+    nn_log.append(n_log)
+
+    print(a_norm, a_log, n_norm, n_log, names[i])
+
+    if names[i] != "t0 p1":
+        plt.errorbar(a_log, n_log, xerr=data2[i]["err"][0], yerr=data2[i]["err"][1], label=names[i], ecolor=col[i],
+                       color=col[i])
+
+        # if names[i] != "t0 p1":
+    #     plt.errorbar(a_norm, n_norm, xerr=data1[i]["err"][0], yerr=data1[i]["err"][1], label=names[i], ecolor=col[i], color=col[i])
+
+plt.legend()
+plt.xlabel("parametr a")
+plt.ylabel("parametr n")
+plt.show()
+
 # """

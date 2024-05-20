@@ -3,11 +3,15 @@ from sklearn.metrics import r2_score
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import pearsonr
+from scipy.stats import ks_2samp
+from scipy.stats import linregress
 
 
 class Fitted(object):
     def __init__(self, x1, y1, sd1=[], bound_low=[0, 0], bound_high=[2, 10]):
         self.x1 = x1
+        self.x2 = [np.log(x) for x in self.x1]
         self.y1 = y1
         self.y2 = [np.log(-np.log(1 - y)) for y in self.y1]
 
@@ -19,6 +23,9 @@ class Fitted(object):
 
         self.popt1, self.pcov1, self.perr1, self.r_squared1 = [], [], [], 0
         self.popt_ln, self.pcov_ln, self.perr_ln, self.r_squared_ln = [], [], [], 0
+        self.popt_linear, self.pcov_linear, self.perr_linear, self.r_squared_linear = [], [], [], 0
+
+        self.pear = 0
 
     def function(self, x, a, n):
         return 1 - np.exp(-a * np.power(x, n))
@@ -26,60 +33,59 @@ class Fitted(object):
     def function_ln(self, x, a, n):
         return np.log(a) + n * np.log(x)
 
+    def function_linear(self, x, a, n):
+        return a + n * np.array(x)
+
     def fit_both(self):
+
+        self.pear = pearsonr(self.x2, self.y2)
+        print(self.pear)
+
+        # dopasowanie do funkcji Avramiego 1 - np.exp(-a * np.power(x, n))
         self.popt1, self.pcov1 = curve_fit(self.function, self.x1, self.y1, bounds=(self.bound_low, self.bound_high))
         self.perr1 = np.sqrt(np.diag(self.pcov1))
+        print(self.popt1)
 
         residuals = self.y1 - self.function(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
         self.r_squared1 = 1 - (ss_res / ss_tot)
 
-        residuals = self.y2 - self.function_ln(self.x1, *self.popt1)
-        ss_res = np.sum(residuals ** 2)
-        ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
-        print(self.popt1)
-        print(self.y1)
-        print([self.function(x, *self.popt1) for x in self.x1])
-        print(np.sum(self.y1) / np.sum([self.function(x, *self.popt1) for x in self.x1]) * np.array(
-            [self.function(x, *self.popt1) for x in self.x1]))
-
-        self.popt1, self.pcov1 = curve_fit(self.function, self.x1, [self.function(x, *self.popt1) for x in self.x1], bounds=(self.bound_low, self.bound_high))
-        print(self.popt1)
-
-        chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum(
-            [self.function(x, *self.popt1) for x in self.x1]) * np.array(
-            [self.function(x, *self.popt1) for x in self.x1]))
-        r_squared1 = r2_score(self.y1, self.function(self.x1, *self.popt1))
-        print('chi_square_test_statistic is : ' + str(chi_square_test_statistic))
-        print('p_value : ' + str(p_value))
-        print(stats.chi2.ppf(1 - 0.05, df=len(self.y1) - 1))  # """
-        print('r^2 : ' + str(r_squared1))
-
+        # dopasowanie trochę liniowe np.log(a) + n * np.log(x)
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
+        print(self.popt_ln)
 
         residuals = self.y2 - self.function_ln(self.x1, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
         self.r_squared_ln = 1 - (ss_res / ss_tot)
 
-        residuals = self.y1 - self.function(self.x1, *self.popt_ln)
+        # dopasowanie całkiem liniowe a + n * x
+        self.popt_linear, self.pcov_linear = curve_fit(self.function_linear, self.x2, self.y2)
+        self.perr_linear = np.sqrt(np.diag(self.pcov_linear))  # standard deviation error
+        print(self.popt_linear, np.exp(self.popt_linear[0]))
+
+        residuals = self.y2 - self.function_linear(self.x2, *self.popt_linear)
         ss_res = np.sum(residuals ** 2)
-        ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
+        ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
+        self.r_squared_linear = 1 - (ss_res / ss_tot)
+
+        print(stats.linregress([np.log(x) for x in self.x1], self.y2))
+        print("\n\n")
 
     def fit_both_sd(self):
+        self.pear = pearsonr(self.x2, self.y2)
+        print(self.pear)
+
         self.popt1, self.pcov1 = curve_fit(self.function, self.x1, self.y1, sigma=self.sd1, bounds=(self.bound_low, self.bound_high))
         self.perr1 = np.sqrt(np.diag(self.pcov1))
+        print(self.popt1, self.perr1)
 
         residuals = self.y1 - self.function(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
         self.r_squared1 = 1 - (ss_res / ss_tot)
-
-        residuals = self.y2 - self.function_ln(self.x1, *self.popt1)
-        ss_res = np.sum(residuals ** 2)
-        ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
 
         """
         print(self.y1)
@@ -93,28 +99,34 @@ class Fitted(object):
         print(stats.chi2.ppf(1 - 0.05, df=len(self.y1) - 1)) 
         print('r^2 : ' + str(r_squared1))"""
 
-
-
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, sigma=self.sd2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
+        print(self.popt_ln, self.perr_ln)
 
         residuals = self.y2 - self.function_ln(self.x1, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
         self.r_squared_ln = 1 - (ss_res / ss_tot)
 
-        residuals = self.y1 - self.function(self.x1, *self.popt_ln)
-        ss_res = np.sum(residuals ** 2)
-        ss_tot = np.sum((self.y1 - np.mean(self.y1)) ** 2)
+        self.popt_linear, self.pcov_linear = curve_fit(self.function_linear, self.x2, self.y2, sigma=self.sd2)
+        self.perr_linear = np.sqrt(np.diag(self.pcov_linear))  # standard deviation error
+        print(self.popt_linear, np.exp(self.popt_linear[0]), self.perr_linear)
 
-        chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum(
+        residuals = self.y2 - self.function_linear(self.x2, *self.popt_linear)
+        ss_res = np.sum(residuals ** 2)
+        ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
+        self.r_squared_linear = 1 - (ss_res / ss_tot)
+
+        print(stats.linregress([np.log(x) for x in self.x1], self.y2))
+
+        """chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum(
             [self.function(x, *self.popt_ln) for x in self.x1]) * np.array(
             [self.function(x, *self.popt_ln) for x in self.x1]))
         r_squared1 = r2_score(self.y1, self.function(self.x1, *self.popt_ln))
         print('chi_square_test_statistic is : ' + str(chi_square_test_statistic))
         print('p_value : ' + str(p_value))
         print(stats.chi2.ppf(1 - 0.05, df=len(self.y1) - 1))
-        print('r^2 : ' + str(r_squared1))
+        print('r^2 : ' + str(r_squared1))"""
 
         print("\n\n")
 
