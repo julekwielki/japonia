@@ -1,10 +1,9 @@
 from scipy.optimize import curve_fit
-from sklearn.metrics import r2_score
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import pearsonr
-from scipy.stats import ks_2samp
+
 from scipy.stats import linregress
 
 
@@ -80,7 +79,7 @@ class Fitted(object):
 
         self.popt1, self.pcov1 = curve_fit(self.function, self.x1, self.y1, sigma=self.sd1, bounds=(self.bound_low, self.bound_high))
         self.perr1 = np.sqrt(np.diag(self.pcov1))
-        print(self.popt1, self.perr1)
+        print("1 - np.exp(-a * np.power(x, n))\t", self.popt1, self.perr1)
 
         residuals = self.y1 - self.function(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
@@ -101,7 +100,7 @@ class Fitted(object):
 
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x1, self.y2, sigma=self.sd2, bounds=(self.bound_low, self.bound_high))
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
-        print(self.popt_ln, self.perr_ln)
+        print("np.log(a) + n * np.log(x)\t\t", self.popt_ln, self.perr_ln)
 
         residuals = self.y2 - self.function_ln(self.x1, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
@@ -110,14 +109,14 @@ class Fitted(object):
 
         self.popt_linear, self.pcov_linear = curve_fit(self.function_linear, self.x2, self.y2, sigma=self.sd2)
         self.perr_linear = np.sqrt(np.diag(self.pcov_linear))  # standard deviation error
-        print(self.popt_linear, np.exp(self.popt_linear[0]), self.perr_linear)
+        print("a + n * np.array(x)\t\t\t\t", self.popt_linear, np.exp(self.popt_linear[0]), self.perr_linear, np.exp(self.popt_linear[0])*self.perr_linear[0])
 
         residuals = self.y2 - self.function_linear(self.x2, *self.popt_linear)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y2 - np.mean(self.y2)) ** 2)
         self.r_squared_linear = 1 - (ss_res / ss_tot)
 
-        print(stats.linregress([np.log(x) for x in self.x1], self.y2))
+        print(stats.linregress(self.x2, self.y2))
 
         """chi_square_test_statistic, p_value = stats.chisquare(self.y1, np.sum(self.y1) / np.sum(
             [self.function(x, *self.popt_ln) for x in self.x1]) * np.array(
@@ -194,19 +193,21 @@ class Fitted(object):
 
 class Fitted_one_log(object):
     def __init__(self, x, y, sd=[]):
-        self.x = x
-        self.y = [np.log(-np.log(1 - y)) for y in y]
-
+        self.x = [np.log(x1) for x1 in x]
+        self.y = [np.log(-np.log(1 - y1)) for y1 in y]
         self.sd = [np.abs(sd[i]/(np.log(1-y[i])*(1 - y[i]))) for i in range(len(sd))]
 
         self.popt_ln, self.pcov_ln, self.perr_ln, self.r_squared_ln = [], [], [], 0
 
     def function_ln(self, x, a, n):
-        return np.log(a) + n * np.log(x)
+        return a + n * np.array(x)
 
     def fit_both_sd(self):
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x, self.y, sigma=self.sd)
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
+
+        self.pear = pearsonr(self.x, self.y)
+        # print(self.pear)
 
         residuals = self.y - self.function_ln(self.x, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
@@ -219,8 +220,17 @@ class Fitted_one_log(object):
         self.popt_ln, self.pcov_ln = curve_fit(self.function_ln, self.x, self.y)
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
 
+        self.pear = pearsonr(self.x, self.y)
+        # print(self.pear)
+
         residuals = self.y - self.function_ln(self.x, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((self.y - np.mean(self.y)) ** 2)
         self.r_squared_ln = 1 - (ss_res / ss_tot)
         return self.popt_ln, self.pcov_ln, self.perr_ln, self.r_squared_ln
+
+    def toasty(self):
+        dane1 = {'param': self.popt_ln, 'cov': self.pcov_ln, 'err': self.perr_ln, 'r2': self.r_squared_ln}
+        return dane1
+
+

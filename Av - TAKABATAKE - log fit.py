@@ -197,6 +197,7 @@ for i in range(len(time_all0)):
     ax[1][1].set_ylabel("zlogarytmowane")
     plt.savefig(names[i] + " sd.png")
     plt.show()  # """
+    plt.show()
 
 # """
 ax[0].legend(loc=2)

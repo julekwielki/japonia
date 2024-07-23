@@ -84,7 +84,7 @@ plt.title("Parity fit - fit for c")
 plt.show()
 # """  # full fit with c
 
-"""
+#"""
 
 def func(x, a, n):
     return 1 - np.exp(-a * np.power(x, n))
@@ -333,8 +333,6 @@ for i in range(len(t)):
     # text = text + name[i] + "\na\tu(a)\tn\tu(n)\tr^2\n"
     # text = text + f'{popt[0]:.3f}' + "\t" + f'{perr[0]:.3f}' + "\t" + f'{popt[1]:.5f}' + "\t" + f'{perr[1]:.5f}' + "\t" + f'{r_squared:.3f}' + "\n"
     plt.errorbar(popt[0], popt[1], xerr=perr[0], yerr=perr[1], fmt='o', ecolor=col[i], color=col[i], label=name[i])
-
-print(text)
 
 plt.legend()
 # plt.xscale("log")
