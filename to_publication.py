@@ -88,9 +88,6 @@ for i in range(len(time_all0)):
     text = text + name0[i] + "\na(u(a))\tn(u(n))\tr^2\n"
     text = text + f'{aaa[0]:.4f}' + " (" + f'{aaa[1]:.4f}' + ")\t" + f'{aaa[2]:.2f}' + " (" + f'{aaa[3]:.2f}' + ")\t" + f'{aaa[4]:.3f}' + "\n"
 
-
-print(text)
-
 box = ax[0].get_position()
 ax[0].set_position([box.x0, box.y0, box.width * 0.8, box.height])
 ax[0].legend(loc='center left', bbox_to_anchor=(1, -0.1))
@@ -120,7 +117,7 @@ A.fit_both_sd()
 dane0 = A.toasty()
 aaa = [np.exp(dane0["param"][0]), dane0['err'][0] * np.exp(dane0["param"][0]), dane0["param"][1], dane0['err'][1],
        dane0['r2'], "BRCA1 normal", "teal"]
-text = text + name0[i] + "\na(u(a))\tn(u(n))\tr^2\n"
+text = text + "BRCA1 normal" + "\na(u(a))\tn(u(n))\tr^2\n"
 text = text + f'{aaa[0]:.4f}' + " (" + f'{aaa[1]:.4f}' + ")\t" + f'{aaa[2]:.2f}' + " (" + f'{aaa[3]:.2f}' + ")\t" + f'{aaa[4]:.3f}' + "\n"
 data_all.append(aaa)
 
@@ -142,7 +139,7 @@ A.fit_both_sd()
 dane0 = A.toasty()
 aaa = [np.exp(dane0["param"][0]), dane0['err'][0] * np.exp(dane0["param"][0]), dane0["param"][1], dane0['err'][1],
        dane0['r2'], "BRCA1 mutation", "indigo"]
-text = text + name0[i] + "\na(u(a))\tn(u(n))\tr^2\n"
+text = text + "BRCA1 mutation" + "\na(u(a))\tn(u(n))\tr^2\n"
 text = text + f'{aaa[0]:.4f}' + " (" + f'{aaa[1]:.4f}' + ")\t" + f'{aaa[2]:.2f}' + " (" + f'{aaa[3]:.2f}' + ")\t" + f'{aaa[4]:.3f}' + "\n"
 data_all.append(aaa)
 
@@ -185,3 +182,5 @@ plt.xlabel("parameter a")
 plt.ylabel("parameter k")
 plt.legend()
 plt.show()
+
+print(text)
