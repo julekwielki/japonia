@@ -45,7 +45,7 @@ class Fitted(object):
                                                    [self.bound_high[0], self.bound_high[1]]))
         self.perr1 = np.sqrt(np.diag(self.pcov1))  # standard deviation error
 
-        print(self.popt1)
+        # print(self.popt1)
 
         residuals = self.y1 - self.function(self.x1, *self.popt1)
         ss_res = np.sum(residuals ** 2)
@@ -57,7 +57,7 @@ class Fitted(object):
                                                    [self.bound_high[0], self.bound_high[2]]))
         self.perr2 = np.sqrt(np.diag(self.pcov2))  # standard deviation error
 
-        print(self.popt2)
+        # print(self.popt2)
 
         residuals = self.y2 - self.function(self.x2, *self.popt2)
         ss_res = np.sum(residuals ** 2)
@@ -68,7 +68,7 @@ class Fitted(object):
                                            bounds=(self.bound_low, self.bound_high))
         self.perr3 = np.sqrt(np.diag(self.pcov3))  # standard deviation error - nie zawsze prawdziwe
 
-        print(self.popt3)
+        # print(self.popt3)
 
         residuals = self.y1 - self.fun1(self.x1, *self.popt3)
         ss_res = np.sum(residuals ** 2)

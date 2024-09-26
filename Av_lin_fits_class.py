@@ -207,8 +207,8 @@ class Fitted_one_log(object):
         self.perr_ln = np.sqrt(np.diag(self.pcov_ln))  # standard deviation error
 
         self.pear = pearsonr(self.x, self.y)
-        print(self.pear)
-        print(stats.linregress(self.x, self.y))
+        # print(self.pear)
+        # print(stats.linregress(self.x, self.y))
 
         residuals = self.y - self.function_ln(self.x, *self.popt_ln)
         ss_res = np.sum(residuals ** 2)
